@@ -78,14 +78,14 @@ WSGI_APPLICATION = 'HoneyLyrics.wsgi.application'
 
 DATABASES = {
     'default': {
-        # 'ENGINE': 'django.db.backends.sqlite3',
-        # 'NAME': BASE_DIR / 'db.sqlite3',
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'mysql',  #mysql
-        'USER': 'root', #root
-        'PASSWORD': 'root', #1234
-        'HOST': 'Localhost', #공백으로 냅두면 default localhost
-        'PORT': 3306 #공백으로 냅두면 default 3306
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+        # 'ENGINE': 'django.db.backends.mysql',
+        # 'NAME': 'mysql',  #mysql
+        # 'USER': 'root', #root
+        # 'PASSWORD': 'root', #1234
+        # 'HOST': 'Localhost', #공백으로 냅두면 default localhost
+        # 'PORT': 3306 #공백으로 냅두면 default 3306
     }
 }
 
