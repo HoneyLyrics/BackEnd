@@ -1,6 +1,10 @@
+import pandas as pd
 import requests
 import re
 from bs4 import BeautifulSoup
+from time import sleep
+import random
+
 import json
 
 URL = {
@@ -36,35 +40,57 @@ def getList(time):
                 "name": tag.find("div", {"class": "ellipsis rank01"}).getText().strip(),
                 "artists": tag.find("span", {"class": "checkEllipsis"}).getText(),
                 "ranking": rank,
-                "songId": re.search(r'goSongDetail\(\'(.*)\'\)', str(tag)).group(1),
-                "albumId": re.search(r'goAlbumDetail\(\'(.*)\'\)', str(tag)).group(1)
+                "songId": re.search(r'goSongDetail\(\'([0-9]+)\'\)', str(tag)).group(1),
+                "albumId": re.search(r'goAlbumDetail\(\'([0-9]+)\'\)', str(tag)).group(1)
             }
             rank+=1
 
     else:
+ 
         for tag in soup.findAll("tr", {"class": ["lst50", "lst100"]}):
             # Key is ranking of the song
             data[tag.find("span", {"class": ["rank top", "rank"]}).getText()] = {
                 "name": tag.find("div", {"class": "ellipsis rank01"}).getText().strip(),
                 "ranking": tag.find("span", {"class": ["rank top", "rank"]}).getText(),
                 "artists": tag.find("span", {"class": "checkEllipsis"}).getText(),
-                "songId": re.search(r'goSongDetail\(\'(.*)\'\)', str(tag)).group(1),
-                "albumId": re.search(r'goAlbumDetail\(\'(.*)\'\)', str(tag)).group(1)
-            }
-        # Some data is in Korean, must format with utf-8 to avoid printing out utf code
-    return json.dumps(data, ensure_ascii=False).encode('utf-8-sig')
+                "songId": re.search(r'goSongDetail\(\'([0-9]+)\'\)', str(tag)).group(1),
+                "albumId": re.search(r'goAlbumDetail\(\'([0-9]+)\'\)', str(tag)).group(1)
+            }      
+    return data
+
 
 def getLyric(songId):
     url = 'https://www.melon.com/song/detail.htm?songId='+str(songId)
     req = requests.get(url, headers={'User-Agent':"github.com/ko28/melon-api"})
     html = req.text.replace("<BR>", "\n")
+    print(html)
     soup = BeautifulSoup(html, "lxml")
     lyrics = soup.find("div", {"class": "lyric"})
     return lyrics.text.strip() 
 
+def parsing_info():
+    data = {}
+    for _, song_info in getList("MONTH").items():
+        sleep(random.randint(3, 10))
+        print(song_info["songId"])
+        print(getLyric(int(song_info["songId"])))
+        data[song_info["songId"]] = {
+            "name": song_info["name"],
+            "artists": song_info["artists"],
+            "Lyrics": getLyric(int(song_info["songId"]))
+        }
+    return data
+   
+
+def write_csv():
+    data = parsing_info()
+    df = pd.DataFrame.from_dict(data)
+    df.to_csv('./data/result.csv', index=False)
+    return data
+
 
 def main():
-    pass
+    write_csv()
 
 if __name__ == "__main__":
     main()
