@@ -68,12 +68,11 @@ def parsing_info():
     data = []
     for _, song_info in getList("MONTH").items():
         sleep(random.randint(3, 10))
-        # print(song_info["songId"], song_info["title"])    # songId, title 잘 나오는지 출력
-        data[song_info["songId"]] = {
+        print(song_info["songId"], song_info["title"])    # songId, title 잘 나오는지 출력
         data.append(
             {
             "songId":song_info["songId"],
-            "name": song_info["name"],
+            "title": song_info["title"],
             "artists": song_info["artists"],
             "lyrics": getLyric(int(song_info["songId"]))
             }
