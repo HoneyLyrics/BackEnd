@@ -81,9 +81,6 @@ def parsing_info():
             "Lyrics": getLyric(int(song_info["songId"]))
             }
         )
-        data[song_info["songId"]] = {
-           
-        }
     return data
    
 
