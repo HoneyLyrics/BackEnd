@@ -1,6 +1,9 @@
+import pandas as pd
 import requests
 import re
 from bs4 import BeautifulSoup
+from time import sleep
+import random
 import json
 
 URL = {
@@ -36,10 +39,10 @@ def getList(time):
                 "name": tag.find("div", {"class": "ellipsis rank01"}).getText().strip(),
                 "artists": tag.find("span", {"class": "checkEllipsis"}).getText(),
                 "ranking": rank,
-                "songId": re.search(r'goSongDetail\(\'(.*)\'\)', str(tag)).group(1),
-                "albumId": re.search(r'goAlbumDetail\(\'(.*)\'\)', str(tag)).group(1)
-            }
-            rank+=1
+                "songId": re.search(r'goSongDetail\(\'([0-9]+)\'\)', str(tag)).group(1),
+                "albumId": re.search(r'goAlbumDetail\(\'([0-9]+)\'\)', str(tag)).group(1)
+            }    
+            rank += 1
 
     else:
         for tag in soup.findAll("tr", {"class": ["lst50", "lst100"]}):
@@ -48,12 +51,12 @@ def getList(time):
                 "name": tag.find("div", {"class": "ellipsis rank01"}).getText().strip(),
                 "ranking": tag.find("span", {"class": ["rank top", "rank"]}).getText(),
                 "artists": tag.find("span", {"class": "checkEllipsis"}).getText(),
-                "songId": re.search(r'goSongDetail\(\'(.*)\'\)', str(tag)).group(1),
-                "albumId": re.search(r'goAlbumDetail\(\'(.*)\'\)', str(tag)).group(1)
-            }
-        # Some data is in Korean, must format with utf-8 to avoid printing out utf code
-    return json.dumps(data, ensure_ascii=False).encode('utf-8-sig')
+                "songId": re.search(r'goSongDetail\(\'([0-9]+)\'\)', str(tag)).group(1),
+                "albumId": re.search(r'goAlbumDetail\(\'([0-9]+)\'\)', str(tag)).group(1)
+            }      
+    return data
 
+# songID 로부터 가사를 가지고 오는 코드
 def getLyric(songId):
     url = 'https://www.melon.com/song/detail.htm?songId='+str(songId)
     req = requests.get(url, headers={'User-Agent':"github.com/ko28/melon-api"})
@@ -62,10 +65,34 @@ def getLyric(songId):
     lyrics = soup.find("div", {"class": "lyric"})
     return lyrics.text.strip() 
 
+# 크롤링한 결과 (30일 인기차트)를 가져와서 data 에 저장하는 코드
+def parsing_info():
+    data = []
+    for _, song_info in getList("MONTH").items():
+        sleep(random.randint(3, 10))
+        # print(song_info["songId"])
+        # print(getLyric(int(song_info["songId"])))
+        data.append(
+            {
+            "songId":song_info["songId"],
+            "name": song_info["name"],
+            "artists": song_info["artists"],
+            "lyrics": getLyric(int(song_info["songId"]))
+            }
+        )
+    return data
+   
+# csv 저장하는 함수
+def write_csv():
+    data = parsing_info()
+    df = pd.DataFrame.from_dict(data)
+    df.to_csv('./data/result.csv', index=False)
+    return data
+
 
 def main():
-    print(getList("LIVE"))
-    #print(getLyric(30287019))
+    write_csv()
+
 
 if __name__ == "__main__":
     main()
