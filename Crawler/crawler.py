@@ -63,21 +63,26 @@ def getLyric(songId):
     url = 'https://www.melon.com/song/detail.htm?songId='+str(songId)
     req = requests.get(url, headers={'User-Agent':"github.com/ko28/melon-api"})
     html = req.text.replace("<BR>", "\n")
-    print(html)
     soup = BeautifulSoup(html, "lxml")
     lyrics = soup.find("div", {"class": "lyric"})
     return lyrics.text.strip() 
 
 def parsing_info():
-    data = {}
+    data = []
     for _, song_info in getList("MONTH").items():
         sleep(random.randint(3, 10))
         print(song_info["songId"])
         print(getLyric(int(song_info["songId"])))
-        data[song_info["songId"]] = {
+        data.append(
+            {
+            "songId":song_info["songId"],
             "name": song_info["name"],
             "artists": song_info["artists"],
             "Lyrics": getLyric(int(song_info["songId"]))
+            }
+        )
+        data[song_info["songId"]] = {
+           
         }
     return data
    
