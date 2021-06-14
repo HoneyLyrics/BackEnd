@@ -43,6 +43,7 @@ def getList(time):
             rank += 1
 
     else:
+ 
         for tag in soup.findAll("tr", {"class": ["lst50", "lst100"]}):
             # Key is ranking of the song
             data[tag.find("span", {"class": ["rank top", "rank"]}).getText()] = {
