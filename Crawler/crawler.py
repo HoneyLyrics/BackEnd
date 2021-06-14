@@ -65,18 +65,22 @@ def getLyric(songId):
 
 # 크롤링한 결과(30일 인기차트 노래 100개)를 가져와서 data에 저장하는 코드
 def parsing_info():
-    data = {}
+    data = []
     for _, song_info in getList("MONTH").items():
         sleep(random.randint(3, 10))
         # print(song_info["songId"], song_info["title"])    # songId, title 잘 나오는지 출력
         data[song_info["songId"]] = {
+        data.append(
+            {
+            "songId":song_info["songId"],
             "name": song_info["name"],
             "artists": song_info["artists"],
-            "Lyrics": getLyric(int(song_info["songId"]))
-        }
+            "lyrics": getLyric(int(song_info["songId"]))
+            }
+        )
     return data
-   
-# csv파일로 데이터 저장
+
+# csv 저장하는 함수
 def write_csv():
     data = parsing_info()
     df = pd.DataFrame.from_dict(data)
