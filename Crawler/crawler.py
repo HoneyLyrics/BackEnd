@@ -78,7 +78,7 @@ def parsing_info():
             "songId":song_info["songId"],
             "name": song_info["name"],
             "artists": song_info["artists"],
-            "Lyrics": getLyric(int(song_info["songId"]))
+            "lyrics": getLyric(int(song_info["songId"]))
             }
         )
     return data
