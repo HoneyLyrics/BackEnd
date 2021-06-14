@@ -4,6 +4,7 @@ import re
 from bs4 import BeautifulSoup
 from time import sleep
 import random
+
 import json
 
 URL = {
@@ -41,10 +42,11 @@ def getList(time):
                 "ranking": rank,
                 "songId": re.search(r'goSongDetail\(\'([0-9]+)\'\)', str(tag)).group(1),
                 "albumId": re.search(r'goAlbumDetail\(\'([0-9]+)\'\)', str(tag)).group(1)
-            }    
-            rank += 1
+            }
+            rank+=1
 
     else:
+ 
         for tag in soup.findAll("tr", {"class": ["lst50", "lst100"]}):
             # Key is ranking of the song
             data[tag.find("span", {"class": ["rank top", "rank"]}).getText()] = {
@@ -56,7 +58,7 @@ def getList(time):
             }      
     return data
 
-# songID 로부터 가사를 가지고 오는 코드
+
 def getLyric(songId):
     url = 'https://www.melon.com/song/detail.htm?songId='+str(songId)
     req = requests.get(url, headers={'User-Agent':"github.com/ko28/melon-api"})
@@ -65,7 +67,6 @@ def getLyric(songId):
     lyrics = soup.find("div", {"class": "lyric"})
     return lyrics.text.strip() 
 
-# 크롤링한 결과 (30일 인기차트)를 가져와서 data 에 저장하는 코드
 def parsing_info():
     data = []
     for _, song_info in getList("MONTH").items():
@@ -82,7 +83,7 @@ def parsing_info():
         )
     return data
    
-# csv 저장하는 함수
+
 def write_csv():
     data = parsing_info()
     df = pd.DataFrame.from_dict(data)
@@ -92,7 +93,6 @@ def write_csv():
 
 def main():
     write_csv()
-
 
 if __name__ == "__main__":
     main()
