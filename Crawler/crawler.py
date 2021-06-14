@@ -4,7 +4,6 @@ import re
 from bs4 import BeautifulSoup
 from time import sleep
 import random
-import json
 
 URL = {
     'LIVE': 'https://www.melon.com/chart/index.htm',
@@ -13,7 +12,6 @@ URL = {
     'WEEK': 'https://www.melon.com/chart/week/index.htm',
     'MONTH': 'https://www.melon.com/chart/month/index.htm'
 }
-
 
 def getList(time):
     """Generates json file of the top 100 songs + (additional metadata) on Melon
@@ -41,14 +39,14 @@ def getList(time):
                 "ranking": rank,
                 "songId": re.search(r'goSongDetail\(\'([0-9]+)\'\)', str(tag)).group(1),
                 "albumId": re.search(r'goAlbumDetail\(\'([0-9]+)\'\)', str(tag)).group(1)
-            }    
+            }
             rank += 1
 
     else:
         for tag in soup.findAll("tr", {"class": ["lst50", "lst100"]}):
             # Key is ranking of the song
             data[tag.find("span", {"class": ["rank top", "rank"]}).getText()] = {
-                "name": tag.find("div", {"class": "ellipsis rank01"}).getText().strip(),
+                "title": tag.find("div", {"class": "ellipsis rank01"}).getText().strip(),
                 "ranking": tag.find("span", {"class": ["rank top", "rank"]}).getText(),
                 "artists": tag.find("span", {"class": "checkEllipsis"}).getText(),
                 "songId": re.search(r'goSongDetail\(\'([0-9]+)\'\)', str(tag)).group(1),
@@ -56,7 +54,7 @@ def getList(time):
             }      
     return data
 
-# songID 로부터 가사를 가지고 오는 코드
+# songId로부터 가사를 가지고 오는 코드
 def getLyric(songId):
     url = 'https://www.melon.com/song/detail.htm?songId='+str(songId)
     req = requests.get(url, headers={'User-Agent':"github.com/ko28/melon-api"})
@@ -65,13 +63,13 @@ def getLyric(songId):
     lyrics = soup.find("div", {"class": "lyric"})
     return lyrics.text.strip() 
 
-# 크롤링한 결과 (30일 인기차트)를 가져와서 data 에 저장하는 코드
+# 크롤링한 결과(30일 인기차트 노래 100개)를 가져와서 data에 저장하는 코드
 def parsing_info():
     data = []
     for _, song_info in getList("MONTH").items():
         sleep(random.randint(3, 10))
-        # print(song_info["songId"])
-        # print(getLyric(int(song_info["songId"])))
+        # print(song_info["songId"], song_info["title"])    # songId, title 잘 나오는지 출력
+        data[song_info["songId"]] = {
         data.append(
             {
             "songId":song_info["songId"],
@@ -81,7 +79,7 @@ def parsing_info():
             }
         )
     return data
-   
+
 # csv 저장하는 함수
 def write_csv():
     data = parsing_info()
@@ -89,10 +87,8 @@ def write_csv():
     df.to_csv('./data/result.csv', index=False)
     return data
 
-
 def main():
     write_csv()
-
 
 if __name__ == "__main__":
     main()
