@@ -1,7 +1,6 @@
 import pandas as pd
 import requests
 import re
-from urllib.request import urlopen, Request
 from bs4 import BeautifulSoup
 from time import sleep
 import random
@@ -39,7 +38,7 @@ def getList(time):
                 "artists": tag.find("span", {"class": "checkEllipsis"}).getText(),
                 "ranking": rank,
                 "songId": re.search(r'goSongDetail\(\'([0-9]+)\'\)', str(tag)).group(1),
-                "albumId": re.search(r'goAlbumDetail\(\'([0-9]+)\'\)', str(tag)).group(1)
+                "imgUrl": tag.find("a", {"class": "image_typeAll"}).find('img')['src']
             }
             rank += 1
 
@@ -52,7 +51,7 @@ def getList(time):
                 "ranking": tag.find("span", {"class": ["rank top", "rank"]}).getText(),
                 "artists": tag.find("span", {"class": "checkEllipsis"}).getText(),
                 "songId": re.search(r'goSongDetail\(\'([0-9]+)\'\)', str(tag)).group(1),
-                "albumId": re.search(r'goAlbumDetail\(\'([0-9]+)\'\)', str(tag)).group(1)
+                "imgUrl": tag.find("a", {"class": "image_typeAll"}).find('img')['src']
             }      
     return data
 
@@ -70,21 +69,12 @@ def parsing_info():
     data = []
     for _, song_info in getList("MONTH").items():
         sleep(random.randint(3, 10))
-        # print(song_info["songId"], song_info["title"])    # songId, title 잘 나오는지 출력
-        url = "https://www.melon.com/song/detail.htm?songId=" + str(song_info["songId"])
-        header01 = {'User-Agent': 'Mozilla/5.0'}    # header01에 Header Information을 넣어둠
-        html = Request(url, headers=header01)       # Header의 속성에 "header01" 변수를 선언해 줌.
-        source = urlopen(html).read()
-        soup = BeautifulSoup(source, "html.parser")
-        thumb = soup.find("div", {"class": "thumb"})
-        imgurl = thumb.find('img')['src']
-        # print(imgurl)     # 이미지 url 잘 나오는지 출력
         data.append(
             {
             "songId":song_info["songId"],
             "title": song_info["title"],
             "artists": song_info["artists"],
-            "imgUrl": imgurl,
+            "imgUrl": song_info["imgUrl"],
             "lyrics": getLyric(int(song_info["songId"]))
             }
         )
