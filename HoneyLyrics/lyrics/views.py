@@ -33,9 +33,27 @@ class MusicList(View):
 
     # GET Data
     def get(self, request):
-        if request.GET('moodid', False):
-            print(request.GET['moodid'])
-        return JsonResponse({"1":"1"})
+        data = []
+        if request.GET.get('moodid', False):
+            mood = request.GET['moodid']
+            all_entries = SongInfo.objects.filter(
+                mood1__lte=mood,
+                mood2__lte=2,
+                mood3__lte=3
+            )
+            for all_entry in all_entries:
+                lyrics = Lyrics.objects.filter(
+                         songId=SongInfo.objects.get(songId=all_entry.songId)
+                        )[0].content
+                data.append({
+                    'songId': all_entry.songId,
+                    'singer': all_entry.artist,
+                    'title': all_entry.title,
+                    'lyrics': lyrics
+                })
+        json_data = json.dumps(data, ensure_ascii=False).encode('utf-8')
+        return HttpResponse(json_data, content_type="application/json")
+
 
     # post Data
     def musiclist(self, request):
