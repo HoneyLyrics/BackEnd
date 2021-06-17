@@ -3,7 +3,7 @@ from .models import SongInfo, Mood, Lyrics
 
 # Register your models here.
 class SongInfoAdmin(admin.ModelAdmin):
-    list_display = ['title', 'artist', 'mood1', 'mood2', 'mood3', ]
+    list_display = ['songId', 'title', 'artist', 'mood1', 'mood2', 'mood3', ]
 admin.site.register(SongInfo, SongInfoAdmin)
 
 class MoodAdmin(admin.ModelAdmin):
