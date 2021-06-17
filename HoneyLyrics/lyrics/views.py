@@ -18,6 +18,7 @@ class Song(View):
             data.append({
                 'songId': all_entry.songId,
                 'singer': all_entry.artist,
+                'imgURL': all_entry.imgURL,
                 'title': all_entry.title,
             })
         json_data = json.dumps(data, ensure_ascii=False).encode('utf-8')
@@ -32,9 +33,10 @@ class Crawler(View):
         data = json.loads(request.body)
         # TODO Data predict code 넣기
         for song_info in data:
-            song = SongInfo(songId=song_info['songId'], 
+            song = SongInfo(songId=song_info['songId'],
                              title=song_info['title'],
                              artist=song_info['artists'],
+                             imageURL=song_info['imgUrl'],
                              mood1 = Mood.objects.get(moodId=1),
                              mood2 = Mood.objects.get(moodId=2),
                              mood3 = Mood.objects.get(moodId=3))
@@ -68,6 +70,7 @@ class MusicList(View):
                     'songId': all_entry.songId,
                     'singer': all_entry.artist,
                     'title': all_entry.title,
+                    'imgURL': all_entry.imgURL,
                     'lyrics': lyrics
                 })
         json_data = json.dumps(data, ensure_ascii=False).encode('utf-8')
