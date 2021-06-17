@@ -11,5 +11,5 @@ class MoodAdmin(admin.ModelAdmin):
 admin.site.register(Mood, MoodAdmin)
 
 class LyricsAdmin(admin.ModelAdmin):
-    list_display = ['content', ]
+    list_display = ['songId', 'content', ]
 admin.site.register(Lyrics, LyricsAdmin)
