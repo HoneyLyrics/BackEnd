@@ -9,18 +9,19 @@ import json
 class Song(View):
     def get(self, request):
         data = []
+
         if request.GET.get('songid', False):
             song_id = request.GET['songid']
             print("songid", song_id)
             all_entries = SongInfo.objects.filter(songId=song_id)
-        for all_entry in all_entries:
-            print(all_entry.songId)
-            data.append({
-                'songId': all_entry.songId,
-                'singer': all_entry.artist,
-                'imgURL': all_entry.imgURL,
-                'title': all_entry.title,
-            })
+            for all_entry in all_entries:
+                print(all_entry.songId)
+                data.append({
+                    'songId': all_entry.songId,
+                    'singer': all_entry.artist,
+                    'imgURL': all_entry.imgURL,
+                    'title': all_entry.title,
+                })
         json_data = json.dumps(data, ensure_ascii=False).encode('utf-8')
         return HttpResponse(json_data, content_type="application/json")
 
