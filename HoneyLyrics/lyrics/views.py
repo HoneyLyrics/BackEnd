@@ -71,7 +71,6 @@ class MusicList(View):
                 lyrics = Lyrics.objects.filter(
                          songId=SongInfo.objects.get(songId=all_entry.songId)
                         )[0].content
-                print(lyrics)
                 data.append({
                     'songId': all_entry.songId,
                     'singer': all_entry.artist,
@@ -89,5 +88,4 @@ class MusicList(View):
 
 
     
-
 
