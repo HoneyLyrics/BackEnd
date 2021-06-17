@@ -7,7 +7,7 @@ class SongInfoAdmin(admin.ModelAdmin):
 admin.site.register(SongInfo, SongInfoAdmin)
 
 class MoodAdmin(admin.ModelAdmin):
-    list_display = ['mood', ]
+    list_display = ['moodId', 'mood', ]
 admin.site.register(Mood, MoodAdmin)
 
 class LyricsAdmin(admin.ModelAdmin):
