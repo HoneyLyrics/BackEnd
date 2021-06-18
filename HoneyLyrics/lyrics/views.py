@@ -3,6 +3,7 @@ from django.views import View
 from django.http.response import JsonResponse, HttpResponse
 from lyrics.models import SongInfo, Lyrics, Mood
 import json
+from django.db.models import Q
 # , redirect, get_list_or_404, get_object_or_404
 
 
@@ -33,14 +34,16 @@ class Crawler(View):
     def post(self, request):
         data = json.loads(request.body)
         # TODO Data predict code 넣기
+        
         for song_info in data:
             song = SongInfo(songId=song_info['songId'],
-                             title=song_info['title'],
-                             artist=song_info['artists'],
-                             imageURL=song_info['imgUrl'],
-                             mood1 = Mood.objects.get(moodId=1),
-                             mood2 = Mood.objects.get(moodId=2),
-                             mood3 = Mood.objects.get(moodId=3))
+                            title=song_info['title'],
+                            artist=song_info['artists'],
+                            imgURL=song_info['imgUrl'],
+                            mood1=Mood.objects.get(moodId=song_info['mood1']),
+                            mood2=Mood.objects.get(moodId=song_info['mood2']),
+                            mood3=Mood.objects.get(moodId=song_info['mood3'])
+                            )
 
             lyric = Lyrics(songId=SongInfo.objects.get(songId=song_info['songId']), 
                            content=song_info['lyrics'])
@@ -52,17 +55,18 @@ class Crawler(View):
 # Create your views here.
 
 class MusicList(View):
-
     # GET Data
     def get(self, request):
         data = []
         if request.GET.get('moodid', False):
             mood = request.GET['moodid']
             all_entries = SongInfo.objects.filter(
-                mood1__lte=mood,
-                mood2__lte=2,
-                mood3__lte=3
+                Q(mood1=Mood.objects.get(moodId=mood))|
+                Q(mood2=Mood.objects.get(moodId=mood))|
+                Q(mood3=Mood.objects.get(moodId=mood))
             )
+            
+            #print(all_entries)
             for all_entry in all_entries:
                 lyrics = Lyrics.objects.filter(
                          songId=SongInfo.objects.get(songId=all_entry.songId)
@@ -84,5 +88,4 @@ class MusicList(View):
 
 
     
-
 
