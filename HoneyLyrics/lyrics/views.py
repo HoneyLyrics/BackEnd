@@ -17,6 +17,9 @@ class Song(View):
             song_id = request.GET['songid']
             all_entries = SongInfo.objects.filter(songId=song_id)
             for all_entry in all_entries:
+                lyrics = Lyrics.objects.filter(
+                         songId=SongInfo.objects.get(songId=all_entry.songId)
+                        )[0].content
                 data.append({
                     'songId': all_entry.songId,
                     'singer': all_entry.artist,
@@ -24,7 +27,8 @@ class Song(View):
                     'title': all_entry.title,
                     'mood1': all_entry.mood1.moodId,
                     'mood2': all_entry.mood2.moodId,
-                    'mood3': all_entry.mood3.moodId, 
+                    'mood3': all_entry.mood3.moodId,
+                    'lyrics': lyrics,
                 })
         json_data = json.dumps(data, ensure_ascii=False).encode('utf-8')
         return HttpResponse(json_data, content_type="application/json")
@@ -46,7 +50,7 @@ class Crawler(View):
                             imgURL=song_info['imgUrl'],
                             mood1=Mood.objects.get(moodId=song_info['mood1']),
                             mood2=Mood.objects.get(moodId=song_info['mood2']),
-                            mood3=Mood.objects.get(moodId=song_info['mood3'])
+                            mood3=Mood.objects.get(moodId=song_info['mood3']),
                             )
             lyric = Lyrics(songId=SongInfo.objects.get(songId=song_info['songId']), 
                            content=song_info['lyrics'])
@@ -80,7 +84,7 @@ class MusicList(View):
                     'singer': all_entry.artist,
                     'title': all_entry.title,
                     'imgURL': all_entry.imgURL,
-                    'lyrics': lyrics
+                    'lyrics': lyrics,
                 })
         json_data = json.dumps(data, ensure_ascii=False).encode('utf-8')
         return HttpResponse(json_data, content_type="application/json")
