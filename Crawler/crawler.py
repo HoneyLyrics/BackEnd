@@ -1,6 +1,7 @@
 import pandas as pd
 import requests
 import re
+from urllib.request import urlopen, Request
 from bs4 import BeautifulSoup
 from time import sleep
 import random
@@ -37,27 +38,24 @@ def getList(time):
                 "name": tag.find("div", {"class": "ellipsis rank01"}).getText().strip(),
                 "artists": tag.find("span", {"class": "checkEllipsis"}).getText(),
                 "ranking": rank,
-                "songId": re.search(r'goSongDetail\(\'([0-9]+)\'\)', str(tag)).group(1),
-                "albumId": re.search(r'goAlbumDetail\(\'([0-9]+)\'\)', str(tag)).group(1)
+                "songId": re.search(r'goSongDetail\(\'([0-9]+)\'\)', str(tag)).group(1)
             }
             rank += 1
 
     else:
- 
         for tag in soup.findAll("tr", {"class": ["lst50", "lst100"]}):
             # Key is ranking of the song
             data[tag.find("span", {"class": ["rank top", "rank"]}).getText()] = {
                 "title": tag.find("div", {"class": "ellipsis rank01"}).getText().strip(),
                 "ranking": tag.find("span", {"class": ["rank top", "rank"]}).getText(),
                 "artists": tag.find("span", {"class": "checkEllipsis"}).getText(),
-                "songId": re.search(r'goSongDetail\(\'([0-9]+)\'\)', str(tag)).group(1),
-                "albumId": re.search(r'goAlbumDetail\(\'([0-9]+)\'\)', str(tag)).group(1)
+                "songId": re.search(r'goSongDetail\(\'([0-9]+)\'\)', str(tag)).group(1)
             }      
     return data
 
 # songId로부터 가사를 가지고 오는 코드
 def getLyric(songId):
-    url = 'https://www.melon.com/song/detail.htm?songId='+str(songId)
+    url = 'https://www.melon.com/song/detail.htm?songId=' + str(songId)
     req = requests.get(url, headers={'User-Agent':"github.com/ko28/melon-api"})
     html = req.text.replace("<BR>", "\n")
     soup = BeautifulSoup(html, "lxml")
@@ -69,12 +67,18 @@ def parsing_info():
     data = []
     for _, song_info in getList("MONTH").items():
         sleep(random.randint(3, 10))
-        # print(song_info["songId"], song_info["title"])    # songId, title 잘 나오는지 출력
+        url = "https://www.melon.com/song/detail.htm?songId=" + str(song_info["songId"])
+        html = Request(url, headers={'User-Agent': 'Mozilla/5.0'})       # Header의 속성에 Header Information을 넣어둠
+        soup = BeautifulSoup(urlopen(html).read(), "html.parser")
+        thumb = soup.find("div", {"class": "thumb"})
+        imgurl = thumb.find('img')['src']
+        # print(song_info["title"], imgurl)     # 이미지 url 잘 나오는지 출력
         data.append(
             {
             "songId":song_info["songId"],
             "title": song_info["title"],
             "artists": song_info["artists"],
+            "imgUrl": imgurl,
             "lyrics": getLyric(int(song_info["songId"]))
             }
         )

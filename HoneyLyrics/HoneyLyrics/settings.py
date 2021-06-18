@@ -28,7 +28,7 @@ SECRET_KEY = 'django-insecure-pmb3+q8^n*=qu(=sy)yih0p_be#&*3$gil&luyb%gm-1&uh219
 DEBUG = True
 
 # TODO change ip appropriate
-ALLOWED_HOSTS = ['localhost', '127.0.0.1','192.168.43.25', '192.168.0.89']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1','192.168.43.25', '192.168.0.89', '192.168.0.4']
 
 
 # Application definition
